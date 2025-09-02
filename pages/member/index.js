@@ -69,18 +69,18 @@ export default function Members() {
 
             <div
                 className={`mt-6 ${center
-                        ? "flex justify-center flex-wrap gap-8"
-                        : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+                    ? "flex justify-center flex-wrap gap-8"
+                    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
                     }`}
             >
                 {data.map((member) => (
                     <motion.div
                         key={member.id}
                         whileHover={{ scale: 1.05 }}
-                        className="w-64 bg-white shadow-lg p-6 rounded-2xl flex flex-col items-center text-center transition-transform duration-300 border-2 border-purple-300"
+                        className="w-full max-w-xs bg-white shadow-lg p-6 rounded-2xl flex flex-col items-center text-center transition-transform duration-300 border-2 border-purple-300 h-80"
                     >
-                        <User size={50} className="text-purple-500 mb-4" />
-                        <h3 className="text-2xl font-bold mb-1 text-black">
+                        <User size={50} className="text-purple-500 mb-4 flex-shrink-0" />
+                        <h3 className="text-xl font-bold mb-1 text-black truncate w-full">
                             {member.Username}
                         </h3>
 
@@ -88,32 +88,33 @@ export default function Members() {
                         {member.Peringkat && (
                             <p
                                 className={`text-sm font-extrabold mb-2 px-3 py-1 rounded-full 
-                                    ${member.Peringkat === "Captain"
+        ${member.Peringkat === "Captain"
                                         ? "bg-red-100 text-red-600"
-                                        : "bg-blue-100 text-blue-600"
-                                    }
-                                `}
+                                        : "bg-blue-100 text-blue-600"}
+      `}
                             >
                                 {member.Peringkat}
                             </p>
                         )}
 
-                        <p className="text-purple-700 mb-4">
+                        <p className="text-purple-700 mb-4 break-words">
                             ID Game: {member.ID}
                         </p>
 
                         {/* Performance Indicator */}
                         <span
-                            className={`px-4 py-2 rounded-full text-sm font-bold mb-4 ${member.Status === "Good"
+                            className={`px-4 py-2 rounded-full text-sm font-bold mt-auto
+      ${member.Status === "Good"
                                     ? "bg-green-500 text-white"
                                     : member.Status === "Warning"
                                         ? "bg-yellow-400 text-black"
-                                        : "bg-red-600 text-white"
-                                }`}
+                                        : "bg-red-600 text-white"}
+    `}
                         >
                             {member.Status}
                         </span>
                     </motion.div>
+
                 ))}
             </div>
         </div>
