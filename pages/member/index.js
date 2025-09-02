@@ -58,7 +58,6 @@ export default function Members() {
     const others = members.filter(
         (m) => m.Peringkat !== "Captain" && m.Peringkat !== "Vice Captain"
     );
-
     // Component untuk render group
     const renderGroup = (title, data, center = false) => (
         <div className="border-4 border-purple-700 rounded-2xl p-6 mb-12 relative">
@@ -68,13 +67,12 @@ export default function Members() {
             </h3>
 
             <div
-                className={`mt-6 grid gap-8 
-    ${center
-                        ? "justify-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                        : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"}
-  `}
+                className={`mt-6 
+        ${center
+                        ? "flex flex-wrap justify-center gap-8"
+                        : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"}
+      `}
             >
-
                 {data.map((member) => (
                     <motion.div
                         key={member.id}
@@ -90,33 +88,30 @@ export default function Members() {
                         {member.Peringkat && (
                             <p
                                 className={`text-sm font-extrabold mb-2 px-3 py-1 rounded-full 
-        ${member.Peringkat === "Captain"
+                ${member.Peringkat === "Captain"
                                         ? "bg-red-100 text-red-600"
                                         : "bg-blue-100 text-blue-600"}
-      `}
+              `}
                             >
                                 {member.Peringkat}
                             </p>
                         )}
-
                         <p className="text-purple-700 mb-4 break-words">
                             ID Game: {member.ID}
                         </p>
-
                         {/* Performance Indicator */}
                         <span
                             className={`px-4 py-2 rounded-full text-sm font-bold mt-auto
-      ${member.Status === "Good"
+              ${member.Status === "Good"
                                     ? "bg-green-500 text-white"
                                     : member.Status === "Warning"
                                         ? "bg-yellow-400 text-black"
                                         : "bg-red-600 text-white"}
-    `}
+            `}
                         >
                             {member.Status}
                         </span>
                     </motion.div>
-
                 ))}
             </div>
         </div>
