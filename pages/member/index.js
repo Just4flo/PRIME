@@ -68,11 +68,13 @@ export default function Members() {
             </h3>
 
             <div
-                className={`mt-6 ${center
-                    ? "flex justify-center flex-wrap gap-8"
-                    : "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
-                    }`}
+                className={`mt-6 grid gap-8 
+    ${center
+                        ? "justify-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                        : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"}
+  `}
             >
+
                 {data.map((member) => (
                     <motion.div
                         key={member.id}
