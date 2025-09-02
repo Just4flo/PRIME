@@ -148,74 +148,75 @@ export default function MembersPage() {
                 </div>
 
                 <div className="overflow-x-auto bg-gray-100/90 p-6 rounded-2xl shadow-xl text-black max-h-[70vh]">
-                    <table className="w-full text-left border-collapse rounded-lg overflow-hidden">
+                    <table className="w-full text-left border-collapse rounded-lg overflow-hidden text-sm">
                         <thead className="bg-gray-200 text-gray-700 sticky top-0">
                             <tr>
-                                <th className="p-3">Username</th>
-                                <th className="p-3">ID Game</th>
-                                <th className="p-3">Status</th>
-                                <th className="p-3">Peringkat</th>
-                                <th className="p-3">Aksi</th>
+                                <th className="p-2">Username</th>
+                                <th className="p-2">ID Game</th>
+                                <th className="p-2">Status</th>
+                                <th className="p-2">Peringkat</th>
+                                <th className="p-2">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             {/* Row Add Member */}
                             <tr className="border-t bg-white hover:bg-purple-100 transition">
-                                <td className="p-3">
+                                <td className="p-2">
                                     <input
                                         type="text"
-                                        placeholder="Masukkan Username"
+                                        placeholder="Username"
                                         value={newMember.Username}
                                         onChange={(e) => setNewMember({ ...newMember, Username: e.target.value })}
-                                        className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 w-full"
+                                        className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 w-full text-sm"
                                     />
                                 </td>
-                                <td className="p-3">
+                                <td className="p-2">
                                     <input
                                         type="text"
-                                        placeholder="Masukkan ID Game"
+                                        placeholder="ID Game"
                                         value={newMember.ID}
                                         onChange={(e) => setNewMember({ ...newMember, ID: e.target.value })}
-                                        className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 w-full"
+                                        className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 w-full text-sm"
                                     />
                                 </td>
-                                <td className="p-3">
+                                <td className="p-2">
                                     <select
                                         value={newMember.Status}
                                         onChange={(e) => setNewMember({ ...newMember, Status: e.target.value })}
-                                        className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 w-full"
+                                        className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 w-full text-sm"
                                     >
                                         <option value="Good">Good</option>
                                         <option value="Warning">Warning</option>
                                     </select>
                                 </td>
-                                <td className="p-3">
+                                <td className="p-2">
                                     <select
                                         value={newMember.Peringkat || ""}
                                         onChange={(e) => setNewMember({ ...newMember, Peringkat: e.target.value })}
-                                        className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 w-full"
+                                        className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 w-full text-sm"
                                     >
-                                        <option value="">-- Pilih Peringkat --</option>
+                                        <option value="">-- Pilih --</option>
                                         <option value="Captain">Captain</option>
                                         <option value="Vice Captain">Vice Captain</option>
                                     </select>
                                 </td>
-
-
-                                <td className="p-3">
+                                <td className="p-2">
                                     <button
                                         onClick={handleAddMember}
-                                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition"
+                                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow text-sm"
                                     >
-                                        💾 Tambah
+                                        Tambah
                                     </button>
                                 </td>
                             </tr>
 
                             {/* Rows Update Members */}
                             {filteredMembers.map((member, index) => (
-                                <tr key={member.id} className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-purple-100 transition`}>
-                                    <td className="p-3 flex items-center gap-2">
+                                <tr
+                                    key={member.id}
+                                    className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-purple-100 transition`}
+                                >
+                                    <td className="p-2 flex items-center gap-1">
                                         <input
                                             type="checkbox"
                                             checked={member.isSelected || false}
@@ -237,10 +238,10 @@ export default function MembersPage() {
                                                     )
                                                 )
                                             }
-                                            className="px-2 py-1 rounded border border-gray-300 focus:ring-2 focus:ring-purple-500"
+                                            className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 text-sm"
                                         />
                                     </td>
-                                    <td className="p-3">
+                                    <td className="p-2">
                                         <input
                                             type="text"
                                             value={member.ID || ""}
@@ -251,10 +252,10 @@ export default function MembersPage() {
                                                     )
                                                 )
                                             }
-                                            className="px-2 py-1 rounded border border-gray-300 focus:ring-2 focus:ring-purple-500"
+                                            className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 text-sm"
                                         />
                                     </td>
-                                    <td className="p-3">
+                                    <td className="p-2">
                                         <select
                                             value={member.Status || "Good"}
                                             onChange={(e) =>
@@ -264,13 +265,13 @@ export default function MembersPage() {
                                                     )
                                                 )
                                             }
-                                            className={`px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 w-full ${statusColor(member.Status)}`}
+                                            className={`px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 text-sm w-full ${statusColor(member.Status)}`}
                                         >
                                             <option value="Good">Good</option>
                                             <option value="Warning">Warning</option>
                                         </select>
                                     </td>
-                                    <td className="p-3">
+                                    <td className="p-2">
                                         {member.isSelected ? (
                                             <select
                                                 value={member.Peringkat || ""}
@@ -281,9 +282,9 @@ export default function MembersPage() {
                                                         )
                                                     )
                                                 }
-                                                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 w-full"
+                                                className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 text-sm w-full"
                                             >
-                                                <option value="">-- Pilih Peringkat --</option>
+                                                <option value="">-- Pilih --</option>
                                                 <option value="Captain">Captain</option>
                                                 <option value="Vice Captain">Vice Captain</option>
                                             </select>
@@ -291,8 +292,7 @@ export default function MembersPage() {
                                             member.Peringkat || ""
                                         )}
                                     </td>
-
-                                    <td className="p-3 flex gap-2">
+                                    <td className="p-2 flex gap-1">
                                         <button
                                             onClick={() =>
                                                 handleUpdate(member.id, {
@@ -302,27 +302,20 @@ export default function MembersPage() {
                                                     Peringkat: member.Peringkat || "",
                                                 })
                                             }
-                                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg shadow transition"
+                                            className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded shadow text-sm"
                                         >
-                                            💾 Simpan
+                                            Simpan
                                         </button>
 
                                         <button
                                             onClick={() => handleDelete(member.id)}
-                                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg shadow transition"
+                                            className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded shadow text-sm"
                                         >
-                                            🗑️ Hapus
+                                            Hapus
                                         </button>
                                     </td>
                                 </tr>
                             ))}
-                            {filteredMembers.length === 0 && (
-                                <tr>
-                                    <td colSpan="5" className="p-4 text-center text-gray-500">
-                                        ❌ Tidak ada member yang cocok dengan pencarian.
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
                 </div>
