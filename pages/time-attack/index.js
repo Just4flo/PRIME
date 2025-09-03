@@ -19,9 +19,18 @@ import { v4 as uuidv4 } from "uuid";
 export default function TeamAttack() {
     const [members, setMembers] = useState([]);
     const [times, setTimes] = useState({});
+    const [files, setFiles] = useState({}); // simpan file per username
     const [leaderboard, setLeaderboard] = useState([]);
     const [search, setSearch] = useState("");
-    const [session, setSession] = useState(null); // 🔹 Data session aktif
+    const [session, setSession] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null); // modal preview
+
+    // Helper ambil nama setelah "•"
+    const getSecondName = (username) => {
+        if (!username) return "";
+        const parts = String(username).split("•");
+        return parts[1] ? parts[1].trim() : String(username).trim();
+    };
 
     // Ambil daftar members
     useEffect(() => {
@@ -55,7 +64,7 @@ export default function TeamAttack() {
         }
     };
 
-    // 🔹 Ambil session saat pertama render
+    // Ambil session saat pertama render
     useEffect(() => {
         fetchSession();
     }, []);
@@ -73,7 +82,7 @@ export default function TeamAttack() {
     // Konversi "MM:SS.mmm" ke total milidetik
     const timeStringToMs = (timeStr) => {
         const regex = /^(\d{2}):(\d{2})\.(\d{3})$/;
-        const match = timeStr.match(regex);
+        const match = String(timeStr || "").match(regex);
         if (!match) return NaN;
         const [, mm, ss, ms] = match.map(Number);
         return mm * 60000 + ss * 1000 + ms;
@@ -87,60 +96,66 @@ export default function TeamAttack() {
         return `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
     };
 
-    // Submit waktu member
+    // Submit waktu member (WAJIB waktu & gambar)
     const handleSubmit = async (username) => {
         const timeStr = times[username];
         const file = files[username];
 
-        if (!timeStr) {
-            alert("❌ Masukkan waktu yang valid (MM:SS.mmm)!");
+        if (!timeStr || !file) {
+            alert("❌ Waktu dan gambar wajib diisi!");
             return;
         }
 
         const totalMs = timeStringToMs(timeStr);
         if (isNaN(totalMs)) {
-            alert("❌ Format waktu salah! Gunakan MM:SS.mmm");
+            alert("❌ Format waktu salah! Gunakan MM:SS.mmm (mis. 01:23.456)");
             return;
         }
 
-        const userId = uuidv4(); // 🔑 generate userId otomatis
+        const userId = uuidv4(); // generate userId otomatis
 
+        // Upload gambar (wajib)
         let imageUrl = "";
         let publicId = "";
 
-        if (file) {
-            try {
-                const formData = new FormData();
-                formData.append("file", file);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
 
-                const res = await fetch("/api/upload", {
-                    method: "POST",
-                    body: formData,
-                });
+            const res = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
 
-                const data = await res.json();
-                console.log("✅ Upload Response:", data); // <-- DEBUG
-
-                imageUrl = data.url || "";
-                publicId = data.public_id || "";
-            } catch (error) {
-                console.error("❌ Gagal upload gambar:", error);
-                alert("❌ Gagal upload gambar");
-                return;
+            if (!res.ok) {
+                throw new Error("Upload API error");
             }
+
+            const data = await res.json();
+            imageUrl = data.url || "";
+            publicId = data.public_id || "";
+
+            if (!imageUrl) {
+                throw new Error("Upload tidak mengembalikan URL gambar");
+            }
+        } catch (error) {
+            console.error("❌ Gagal upload gambar:", error);
+            alert("❌ Gagal upload gambar");
+            return;
         }
 
+        // Simpan / update dokumen
         try {
-            const q = query(collection(db, "team_attack"), where("Username", "==", username));
-            const snapshot = await getDocs(q);
+            const qUser = query(collection(db, "team_attack"), where("Username", "==", username));
+            const snapshot = await getDocs(qUser);
 
             if (!snapshot.empty) {
                 const docRef = doc(db, "team_attack", snapshot.docs[0].id);
                 await updateDoc(docRef, {
                     userId,
                     time: totalMs,
-                    imageUrl: imageUrl || snapshot.docs[0].data().imageUrl || "",
-                    public_id: publicId || snapshot.docs[0].data().public_id || "",
+                    imageUrl,        // wajib baru
+                    public_id: publicId,
                 });
             } else {
                 await addDoc(collection(db, "team_attack"), {
@@ -151,6 +166,8 @@ export default function TeamAttack() {
                     public_id: publicId,
                 });
             }
+
+            // Reset field user ini
             setTimes((prev) => ({ ...prev, [username]: "" }));
             setFiles((prev) => ({ ...prev, [username]: null }));
         } catch (error) {
@@ -159,62 +176,94 @@ export default function TeamAttack() {
         }
     };
 
-    // 🔍 Filter members berdasarkan search
+    // Filter + sort members (pakai nama setelah "•")
     const filteredMembers = members.filter((m) =>
         m.Username.toLowerCase().includes(search.toLowerCase())
     );
-    const [files, setFiles] = useState({}); // simpan file per username
-    
+    const sortedMembers = [...filteredMembers].sort((a, b) =>
+        getSecondName(a.Username).localeCompare(getSecondName(b.Username))
+    );
 
     return (
         <div className="min-h-screen w-full bg-white text-black flex flex-col">
             <Navbar />
+            {/* Modal Preview Gambar */}
+            {previewImage && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="relative">
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-lg"
+                        />
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full shadow hover:bg-red-700 transition"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className="flex-1 w-full px-4 py-8 md:px-8 md:py-16">
                 {/* Leaderboard Section */}
+                {/* Leaderboard Section */}
                 <div className="w-full max-w-5xl mx-auto border-4 border-purple-700 rounded-xl p-6 shadow-lg mb-8">
-                    {/* Header dengan nama map & tanggal (tetap ada, tidak dihapus) */}
-
-
                     <h2 className="text-2xl font-bold mb-4 text-purple-700 flex items-center gap-2">
                         <Trophy className="w-6 h-6 text-yellow-400" /> TOP 10 LEADERBOARD
                     </h2>
 
-                    {/* 🔹 Tambahan info map & periode di bawah judul leaderboard */}
+                    {/* 🔹 Tambahan info map & periode */}
                     {session && (
                         <div className="mb-4 p-3 rounded-lg bg-yellow-100 border border-yellow-400">
                             <p className="text-lg font-semibold text-yellow-700">
-                                🗺️ Map: {session.mapName}
+                                Track : {session.mapName}
                             </p>
                             <p className="text-sm text-gray-600">
-                                📅 Periode: {session.startDate} s/d {session.endDate}
+                                Period : {session.startDate} s/d {session.endDate}
                             </p>
                         </div>
                     )}
-
-                    <ol className="list-decimal pl-5 space-y-2">
+                    <ol className="list-none space-y-2">
                         {leaderboard.length > 0 ? (
                             leaderboard.map((item, index) => (
                                 <li
                                     key={index}
-                                    className={`flex justify-between p-3 rounded-lg shadow transition ${index === 0
-                                        ? "bg-yellow-300 text-black"
-                                        : index === 1
-                                            ? "bg-gray-300 text-black"
-                                            : index === 2
-                                                ? "bg-orange-300 text-black"
-                                                : "bg-purple-700/50 text-white"
+                                    className={`grid grid-cols-3 items-center p-3 rounded-lg shadow transition text-center ${index === 0
+                                            ? "bg-yellow-300 text-black"
+                                            : index === 1
+                                                ? "bg-gray-300 text-black"
+                                                : index === 2
+                                                    ? "bg-orange-300 text-black"
+                                                    : "bg-purple-700/50 text-white"
                                         }`}
                                 >
-                                    <span>{item.Username}</span>
+                                    {/* Username */}
+                                    <span className="truncate">{item.Username}</span>
+
+                                    {/* Waktu */}
                                     <span>{msToTimeString(item.time)}</span>
+
+                                    {/* Gambar bukti */}
+                                    {item.imageUrl ? (
+                                        <img
+                                            src={item.imageUrl}
+                                            alt="bukti"
+                                            className="w-10 h-10 object-cover rounded cursor-pointer mx-auto"
+                                            onClick={() => setPreviewImage(item.imageUrl)}
+                                        />
+                                    ) : (
+                                        <span className="text-xs text-gray-300">-</span>
+                                    )}
                                 </li>
                             ))
                         ) : (
-                            <li className="text-gray-700">Belum ada data</li>
+                            <li className="text-gray-700 text-center">Belum ada data</li>
                         )}
                     </ol>
                 </div>
+
 
                 {/* Search bar */}
                 <div className="mb-4 max-w-5xl mx-auto">
@@ -234,70 +283,101 @@ export default function TeamAttack() {
                             <tr>
                                 <th className="p-3">Username</th>
                                 <th className="p-3">Waktu (MM:SS.mmm)</th>
-                                <th className="p-3">Gambar</th> {/* Tambahan kolom */}
+                                <th className="p-3">Gambar</th>
                                 <th className="p-3">Aksi</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            {filteredMembers.map((member) => (
-                                <tr
-                                    key={member.id}
-                                    className="border-t border-purple-600 hover:bg-purple-600/30 transition"
-                                >
-                                    <td className="p-3">{member.Username}</td>
-                                    <td className="p-3">
-                                        <input
-                                            type="text"
-                                            placeholder="MM:SS.mmm"
-                                            value={times[member.Username] || ""}
-                                            onChange={(e) =>
-                                                setTimes((prev) => ({ ...prev, [member.Username]: e.target.value }))
-                                            }
-                                            className="px-3 py-2 rounded-lg border border-purple-500 focus:ring-2 focus:ring-yellow-400 w-full text-black"
-                                        />
-                                    </td>
-                                    <td className="p-3">
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files[0];
-                                                if (!file) return;
+                            {sortedMembers.map((member) => {
+                                const selectedFile = files[member.Username];
+                                const timeValue = times[member.Username] || "";
+                                const canSubmit = Boolean(selectedFile && timeValue);
 
-                                                // Validasi tipe file
-                                                if (!file.type.startsWith("image/")) {
-                                                    alert("❌ Hanya file gambar yang diperbolehkan!");
-                                                    e.target.value = null;
-                                                    return;
+                                return (
+                                    <tr
+                                        key={member.id}
+                                        className="border-t border-purple-600 hover:bg-purple-600/30 transition"
+                                    >
+                                        <td className="p-3">{member.Username}</td>
+
+                                        <td className="p-3">
+                                            <input
+                                                type="text"
+                                                placeholder="MM:SS.mmm"
+                                                value={timeValue}
+                                                onChange={(e) =>
+                                                    setTimes((prev) => ({ ...prev, [member.Username]: e.target.value }))
                                                 }
+                                                pattern="\d{2}:\d{2}\.\d{3}"
+                                                title="Gunakan format MM:SS.mmm, contoh 01:23.456"
+                                                className="px-3 py-2 rounded-lg border border-purple-500 focus:ring-2 focus:ring-yellow-400 w-full text-black"
+                                            />
+                                        </td>
 
-                                                // Validasi ukuran < 1 MB
-                                                if (file.size > 1024 * 1024) {
-                                                    alert("❌ Ukuran gambar maksimal 1 MB!");
-                                                    e.target.value = null;
-                                                    return;
-                                                }
+                                        <td className="p-3">
+                                            <div className="flex items-center gap-3">
+                                                <label className="inline-flex items-center px-3 py-2 rounded-lg border border-purple-500 cursor-pointer hover:bg-purple-50">
+                                                    <span className="text-sm">Pilih Gambar</span>
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (!file) return;
 
-                                                setFiles((prev) => ({ ...prev, [member.Username]: file }));
-                                            }}
-                                            className="w-full"
-                                        />
-                                    </td>
+                                                            // Validasi tipe file
+                                                            if (!file.type.startsWith("image/")) {
+                                                                alert("❌ Hanya file gambar yang diperbolehkan!");
+                                                                e.target.value = "";
+                                                                return;
+                                                            }
 
-                                    <td className="p-3">
-                                        <button
-                                            onClick={() => handleSubmit(member.Username)}
-                                            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-5 py-2 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center gap-2"
-                                        >
-                                            💾 Upload & Simpan
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {filteredMembers.length === 0 && (
+                                                            // Validasi ukuran < 1 MB
+                                                            if (file.size > 1024 * 1024) {
+                                                                alert("❌ Ukuran gambar maksimal 1 MB!");
+                                                                e.target.value = "";
+                                                                return;
+                                                            }
+
+                                                            setFiles((prev) => ({ ...prev, [member.Username]: file }));
+                                                        }}
+                                                        className="hidden"
+                                                    />
+                                                </label>
+
+                                                {/* Preview dengan border */}
+                                                {selectedFile && (
+                                                    <img
+                                                        src={URL.createObjectURL(selectedFile)}
+                                                        alt="Preview"
+                                                        className="w-12 h-12 rounded-md object-cover border border-purple-500 shadow"
+                                                    />
+                                                )}
+                                            </div>
+                                        </td>
+
+                                        <td className="p-3">
+                                            <button
+                                                onClick={() => handleSubmit(member.Username)}
+                                                disabled={!canSubmit}
+                                                className={`font-bold px-5 py-2 rounded-lg shadow-lg transition duration-300 ease-in-out transform flex items-center justify-center gap-2
+                          ${canSubmit
+                                                        ? "bg-yellow-500 hover:bg-yellow-600 text-black hover:scale-105"
+                                                        : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                                    }`}
+                                                title={!canSubmit ? "Isi waktu & gambar dulu" : "Upload & Simpan"}
+                                            >
+                                                💾 Upload & Save
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+
+                            {sortedMembers.length === 0 && (
                                 <tr>
-                                    <td colSpan="3" className="text-center py-4 text-gray-700">
+                                    <td colSpan="4" className="text-center py-4 text-gray-700">
                                         ❌ Tidak ada member ditemukan
                                     </td>
                                 </tr>
