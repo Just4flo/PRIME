@@ -106,11 +106,26 @@ export default function MembersPage() {
     };
 
     // Filter members
-    const filteredMembers = members.filter(
-        (m) =>
-            m.Username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            m.ID?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter + Sort members
+    const filteredMembers = members
+        .filter(
+            (m) =>
+                m.Username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                m.ID?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            // Captain duluan
+            if (a.Peringkat === "Captain" && b.Peringkat !== "Captain") return -1;
+            if (b.Peringkat === "Captain" && a.Peringkat !== "Captain") return 1;
+
+            // Vice Captain setelah Captain
+            if (a.Peringkat === "Vice Captain" && b.Peringkat !== "Vice Captain") return -1;
+            if (b.Peringkat === "Vice Captain" && a.Peringkat !== "Vice Captain") return 1;
+
+            // Sisanya abjad Username
+            return (a.Username || "").localeCompare(b.Username || "");
+        });
+
 
     // Status color mapping
     const statusColor = (status) => {
