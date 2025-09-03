@@ -26,6 +26,8 @@ export default function AdminTimeAttackSessions() {
     const [mapName, setMapName] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [previewImage, setPreviewImage] = useState(null);
+
 
     // 🔒 Proteksi login
     useEffect(() => {
@@ -77,10 +79,30 @@ export default function AdminTimeAttackSessions() {
 
                 // urutkan berdasarkan waktu (null di bawah)
                 merged.sort((a, b) => {
+                    // Kalau dua-duanya punya time → urutkan berdasarkan time
+                    if (a.time !== null && b.time !== null) {
+                        return a.time - b.time;
+                    }
+
+                    // Fungsi ambil nama kedua setelah "•"
+                    const getSecondName = (username) => {
+                        if (!username) return "";
+                        const parts = username.split("•");
+                        return parts[1] ? parts[1].trim() : username.trim();
+                    };
+
+                    // Kalau dua-duanya null → urutkan berdasarkan kata setelah "•"
+                    if (a.time === null && b.time === null) {
+                        return getSecondName(a.Username).localeCompare(getSecondName(b.Username));
+                    }
+
+                    // Kalau hanya satu yang null, taruh di bawah
                     if (a.time === null) return 1;
                     if (b.time === null) return -1;
-                    return a.time - b.time;
+
+                    return 0;
                 });
+
 
                 timesData[s.id] = merged;
             }
@@ -321,17 +343,17 @@ export default function AdminTimeAttackSessions() {
                                                     <td className="p-3">{formatTime(t.time)}</td>
                                                     <td className="p-3">
                                                         {t.imageUrl ? (
-                                                            <Image
+                                                            <img
                                                                 src={t.imageUrl}
                                                                 alt={t.Username}
-                                                                width={64}
-                                                                height={64}
-                                                                className="rounded-lg object-cover"
+                                                                className="w-16 h-16 rounded-lg object-cover cursor-pointer hover:scale-105 transition"
+                                                                onClick={() => setPreviewImage(t.imageUrl)}
                                                             />
                                                         ) : (
                                                             <span>Belum upload</span>
                                                         )}
                                                     </td>
+
                                                 </tr>
                                             ))
                                         ) : (
@@ -352,6 +374,24 @@ export default function AdminTimeAttackSessions() {
                     <p className="text-gray-600">❌ Belum ada sesi</p>
                 )}
             </div>
+            {previewImage && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="relative">
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-lg"
+                        />
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full shadow hover:bg-red-700 transition"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
