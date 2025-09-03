@@ -52,7 +52,7 @@ export default function AdminSidebar() {
                             Endurance
                         </option>
                         <option value="duel-team" className="font-bold hover:bg-purple-200">
-                            team duel
+                            Duel
                         </option>
                     </select>
                 </div>
@@ -75,3 +75,4 @@ export default function AdminSidebar() {
         </div>
     );
 }
+
