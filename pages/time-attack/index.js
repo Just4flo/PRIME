@@ -194,8 +194,9 @@ export default function TeamAttack() {
                         <img
                             src={previewImage}
                             alt="Preview"
-                            className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-lg"
+                            className="max-w-[95vw] max-h-[80vh] rounded-lg shadow-lg"
                         />
+
                         <button
                             onClick={() => setPreviewImage(null)}
                             className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full shadow hover:bg-red-700 transition"
@@ -230,7 +231,8 @@ export default function TeamAttack() {
                             leaderboard.map((item, index) => (
                                 <li
                                     key={index}
-                                    className={`grid grid-cols-3 items-center p-3 rounded-lg shadow transition text-center ${index === 0
+                                    className={`grid grid-cols-3 items-center p-2 sm:p-3 rounded-lg shadow text-center text-xs sm:text-sm md:text-base
+        ${index === 0
                                             ? "bg-yellow-300 text-black"
                                             : index === 1
                                                 ? "bg-gray-300 text-black"
@@ -263,23 +265,19 @@ export default function TeamAttack() {
                         )}
                     </ol>
                 </div>
-
-
-                {/* Search bar */}
-                <div className="mb-4 max-w-5xl mx-auto">
-                    <input
-                        type="text"
-                        placeholder="🔍 Cari username..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 rounded-lg border border-purple-500 text-black focus:ring-2 focus:ring-yellow-400"
-                    />
-                </div>
-
-                {/* Member Input Section */}
-                <div className="w-full max-w-5xl mx-auto border-4 border-purple-700 rounded-xl p-6 shadow-lg overflow-x-auto">
-                    <table className="w-full text-left border-collapse rounded-lg overflow-hidden">
-                        <thead className="bg-purple-700 text-white">
+                <div className="w-full max-w-5xl mx-auto border-4 border-purple-700 rounded-xl p-3 sm:p-6 shadow-lg overflow-x-auto">
+                    {/* 🔍 Search bar di dalam box */}
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            placeholder="🔍 Cari username..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full px-3 py-2 rounded-lg border border-purple-500 text-black focus:ring-2 focus:ring-yellow-400 text-sm sm:text-base"
+                        />
+                    </div>
+                    <table className="w-full text-left border-collapse text-xs sm:text-sm md:text-base">
+                        <thead className="bg-purple-700 text-white sticky top-0 z-10">
                             <tr>
                                 <th className="p-3">Username</th>
                                 <th className="p-3">Waktu (MM:SS.mmm)</th>
@@ -311,13 +309,13 @@ export default function TeamAttack() {
                                                 }
                                                 pattern="\d{2}:\d{2}\.\d{3}"
                                                 title="Gunakan format MM:SS.mmm, contoh 01:23.456"
-                                                className="px-3 py-2 rounded-lg border border-purple-500 focus:ring-2 focus:ring-yellow-400 w-full text-black"
+                                                className="px-2 sm:px-3 py-1 sm:py-2 rounded-lg border border-purple-500 focus:ring-2 focus:ring-yellow-400 w-full text-black text-xs sm:text-sm"
                                             />
                                         </td>
 
                                         <td className="p-3">
                                             <div className="flex items-center gap-3">
-                                                <label className="inline-flex items-center px-3 py-2 rounded-lg border border-purple-500 cursor-pointer hover:bg-purple-50">
+                                                <label className="inline-flex items-center px-2 sm:px-3 py-1 sm:py-2 rounded-lg border border-purple-500 cursor-pointer hover:bg-purple-50 text-xs sm:text-sm">
                                                     <span className="text-sm">Pilih Gambar</span>
                                                     <input
                                                         type="file"
@@ -351,7 +349,7 @@ export default function TeamAttack() {
                                                     <img
                                                         src={URL.createObjectURL(selectedFile)}
                                                         alt="Preview"
-                                                        className="w-12 h-12 rounded-md object-cover border border-purple-500 shadow"
+                                                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-md object-cover border border-purple-500 shadow"
                                                     />
                                                 )}
                                             </div>
@@ -361,12 +359,11 @@ export default function TeamAttack() {
                                             <button
                                                 onClick={() => handleSubmit(member.Username)}
                                                 disabled={!canSubmit}
-                                                className={`font-bold px-5 py-2 rounded-lg shadow-lg transition duration-300 ease-in-out transform flex items-center justify-center gap-2
-                          ${canSubmit
+                                                className={`w-full sm:w-auto font-bold px-3 sm:px-5 py-1 sm:py-2 rounded-lg shadow-lg transition transform flex items-center justify-center gap-2 text-xs sm:text-sm
+        ${canSubmit
                                                         ? "bg-yellow-500 hover:bg-yellow-600 text-black hover:scale-105"
                                                         : "bg-gray-300 text-gray-600 cursor-not-allowed"
                                                     }`}
-                                                title={!canSubmit ? "Isi waktu & gambar dulu" : "Upload & Simpan"}
                                             >
                                                 💾 Upload & Save
                                             </button>
