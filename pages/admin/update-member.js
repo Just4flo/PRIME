@@ -4,6 +4,8 @@ import { collection, getDocs, updateDoc, doc, addDoc, deleteDoc } from "firebase
 import AdminSidebar from "@/components/AdminSidebar";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/config/firebase";
+import { motion } from "framer-motion";
+
 
 const auth = getAuth(app);
 
@@ -68,7 +70,6 @@ export default function MembersPage() {
     };
 
     // Update member
-    // Update member
     const handleUpdate = async (id, updatedData) => {
         try {
             // Buang field yang undefined
@@ -106,7 +107,6 @@ export default function MembersPage() {
     };
 
     // Filter members
-    // Filter + Sort members
     const filteredMembers = members
         .filter(
             (m) =>
@@ -114,18 +114,13 @@ export default function MembersPage() {
                 m.ID?.toLowerCase().includes(searchTerm.toLowerCase())
         )
         .sort((a, b) => {
-            // Captain duluan
             if (a.Peringkat === "Captain" && b.Peringkat !== "Captain") return -1;
             if (b.Peringkat === "Captain" && a.Peringkat !== "Captain") return 1;
-
-            // Vice Captain setelah Captain
             if (a.Peringkat === "Vice Captain" && b.Peringkat !== "Vice Captain") return -1;
             if (b.Peringkat === "Vice Captain" && a.Peringkat !== "Vice Captain") return 1;
-
             // Sisanya abjad Username
             return (a.Username || "").localeCompare(b.Username || "");
         });
-
 
     // Status color mapping
     const statusColor = (status) => {
@@ -139,9 +134,9 @@ export default function MembersPage() {
     if (!authChecked || loading) return <div className="flex items-center justify-center min-h-screen text-white bg-purple-900">Loading...</div>;
 
     return (
-        <div className="flex">
+        <div className="flex min-h-screen">
             <AdminSidebar />
-            <div className="ml-64 p-8 w-full min-h-screen bg-gradient-to-br from-gray-100 via-purple-200 to-indigo-300 text-black">
+            <div className="flex-1 lg:ml-64 p-4 sm:p-6 lg:p-8 bg-gradient-to-br from-gray-100 via-purple-200 to-indigo-300 text-black">
                 {/* Toast */}
                 {toast.message && (
                     <div className={`fixed top-5 right-5 px-4 py-2 rounded-lg shadow-lg z-50 ${toast.type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}>
@@ -162,14 +157,14 @@ export default function MembersPage() {
                     />
                 </div>
 
-                <div className="overflow-x-auto bg-gray-100/90 p-6 rounded-2xl shadow-xl text-black max-h-[70vh]">
-                    <table className="w-full text-left border-collapse rounded-lg overflow-hidden text-sm">
-                        <thead className="bg-gray-200 text-gray-700 sticky top-0">
+                <div className="overflow-x-auto bg-white/90 p-4 sm:p-6 rounded-2xl shadow-xl text-black max-h-[70vh]">
+                    <table className="min-w-full text-left border-collapse rounded-lg overflow-hidden text-xs sm:text-sm">
+                        <thead className="bg-gray-200 text-gray-700 sticky top-0 text-xs sm:text-sm">
                             <tr>
                                 <th className="p-2">Username</th>
                                 <th className="p-2">ID Game</th>
-                                <th className="p-2">Status</th>
-                                <th className="p-2">Peringkat</th>
+                                <th className="p-2 hidden sm:table-cell">Status</th>
+                                <th className="p-2 hidden sm:table-cell">Peringkat</th>
                                 <th className="p-2">Aksi</th>
                             </tr>
                         </thead>
@@ -182,7 +177,7 @@ export default function MembersPage() {
                                         placeholder="Username"
                                         value={newMember.Username}
                                         onChange={(e) => setNewMember({ ...newMember, Username: e.target.value })}
-                                        className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 w-full text-sm"
+                                        className="px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 w-full text-xs sm:text-sm"
                                     />
                                 </td>
                                 <td className="p-2">
