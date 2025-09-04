@@ -153,18 +153,179 @@ export default function MembersPage() {
                         placeholder="Cari Username atau ID Game..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
                     />
                 </div>
 
-                <div className="overflow-x-auto bg-white/90 p-4 sm:p-6 rounded-2xl shadow-xl text-black max-h-[70vh]">
+                {/* Mobile View (Card) */}
+                <div className="sm:hidden space-y-4">
+                    {/* Row Add Member */}
+                    <div className="bg-white p-4 rounded-xl shadow-md text-sm">
+                        <div className="mb-2">
+                            <input
+                                type="text"
+                                placeholder="Username"
+                                value={newMember.Username}
+                                onChange={(e) =>
+                                    setNewMember({ ...newMember, Username: e.target.value })
+                                }
+                                className="w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                            />
+                        </div>
+                        <div className="mb-2">
+                            <input
+                                type="text"
+                                placeholder="ID Game"
+                                value={newMember.ID}
+                                onChange={(e) =>
+                                    setNewMember({ ...newMember, ID: e.target.value })
+                                }
+                                className="w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                            />
+                        </div>
+                        <div className="mb-2">
+                            <select
+                                value={newMember.Status}
+                                onChange={(e) =>
+                                    setNewMember({ ...newMember, Status: e.target.value })
+                                }
+                                className="w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                            >
+                                <option value="Good">Good</option>
+                                <option value="Warning">Warning</option>
+                            </select>
+                        </div>
+                        <div className="mb-2">
+                            <select
+                                value={newMember.Peringkat || ""}
+                                onChange={(e) =>
+                                    setNewMember({ ...newMember, Peringkat: e.target.value })
+                                }
+                                className="w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                            >
+                                <option value="">-- Pilih --</option>
+                                <option value="Captain">Captain</option>
+                                <option value="Vice Captain">Vice Captain</option>
+                            </select>
+                        </div>
+                        <button
+                            onClick={handleAddMember}
+                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow w-full"
+                        >
+                            Tambah
+                        </button>
+                    </div>
+
+                    {/* Rows Members */}
+                    {filteredMembers.map((member) => (
+                        <div
+                            key={member.id}
+                            className="bg-white p-4 rounded-xl shadow-md text-sm space-y-2"
+                        >
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={member.isSelected || false}
+                                    onChange={(e) =>
+                                        setMembers((prev) =>
+                                            prev.map((m) =>
+                                                m.id === member.id ? { ...m, isSelected: e.target.checked } : m
+                                            )
+                                        )
+                                    }
+                                />
+                                <input
+                                    type="text"
+                                    value={member.Username || ""}
+                                    onChange={(e) =>
+                                        setMembers((prev) =>
+                                            prev.map((m) =>
+                                                m.id === member.id ? { ...m, Username: e.target.value } : m
+                                            )
+                                        )
+                                    }
+                                    className="flex-1 px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                                />
+                            </div>
+                            <input
+                                type="text"
+                                value={member.ID || ""}
+                                onChange={(e) =>
+                                    setMembers((prev) =>
+                                        prev.map((m) =>
+                                            m.id === member.id ? { ...m, ID: e.target.value } : m
+                                        )
+                                    )
+                                }
+                                className="w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                            />
+                            <select
+                                value={member.Status || "Good"}
+                                onChange={(e) =>
+                                    setMembers((prev) =>
+                                        prev.map((m) =>
+                                            m.id === member.id ? { ...m, Status: e.target.value } : m
+                                        )
+                                    )
+                                }
+                                className={`w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500 ${statusColor(member.Status)}`}
+                            >
+                                <option value="Good">Good</option>
+                                <option value="Warning">Warning</option>
+                            </select>
+                            {member.isSelected ? (
+                                <select
+                                    value={member.Peringkat || ""}
+                                    onChange={(e) =>
+                                        setMembers((prev) =>
+                                            prev.map((m) =>
+                                                m.id === member.id ? { ...m, Peringkat: e.target.value } : m
+                                            )
+                                        )
+                                    }
+                                    className="w-full px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-purple-500"
+                                >
+                                    <option value="">-- Pilih --</option>
+                                    <option value="Captain">Captain</option>
+                                    <option value="Vice Captain">Vice Captain</option>
+                                </select>
+                            ) : (
+                                <div className="text-gray-700">{member.Peringkat || ""}</div>
+                            )}
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() =>
+                                        handleUpdate(member.id, {
+                                            Username: member.Username || "",
+                                            ID: member.ID || "",
+                                            Status: member.Status || "Good",
+                                            Peringkat: member.Peringkat || "",
+                                        })
+                                    }
+                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded shadow flex-1"
+                                >
+                                    Simpan
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(member.id)}
+                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded shadow flex-1"
+                                >
+                                    Hapus
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>                                                  
+
+                {/* Desktop View (Table) */}
+                <div className="hidden sm:block overflow-x-auto bg-white/90 p-4 sm:p-6 rounded-2xl shadow-xl text-black max-h-[70vh]">
                     <table className="min-w-full text-left border-collapse rounded-lg overflow-hidden text-xs sm:text-sm">
                         <thead className="bg-gray-200 text-gray-700 sticky top-0 text-xs sm:text-sm">
                             <tr>
                                 <th className="p-2">Username</th>
                                 <th className="p-2">ID Game</th>
-                                <th className="p-2 hidden sm:table-cell">Status</th>
-                                <th className="p-2 hidden sm:table-cell">Peringkat</th>
+                                <th className="p-2">Status</th>
+                                <th className="p-2">Peringkat</th>
                                 <th className="p-2">Aksi</th>
                             </tr>
                         </thead>
