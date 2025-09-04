@@ -55,9 +55,10 @@ export default function Members() {
     // Grouping berdasarkan peringkat
     const captains = members.filter((m) => m.Peringkat === "Captain");
     const viceCaptains = members.filter((m) => m.Peringkat === "Vice Captain");
-    const others = members.filter(
-        (m) => m.Peringkat !== "Captain" && m.Peringkat !== "Vice Captain"
-    );
+    const others = members
+        .filter((m) => m.Peringkat !== "Captain" && m.Peringkat !== "Vice Captain")
+        .sort((a, b) => (a.Username || "").localeCompare(b.Username || ""));
+
     // Component untuk render group
     const renderGroup = (title, data, center = false) => (
         <div className="border-4 border-purple-700 rounded-2xl p-6 mb-12 relative">
@@ -145,3 +146,4 @@ export default function Members() {
         </div>
     );
 }
+
