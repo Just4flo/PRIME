@@ -99,14 +99,10 @@ export default function AdminTimeAttackSessions() {
                     // Kalau hanya satu yang null, taruh di bawah
                     if (a.time === null) return 1;
                     if (b.time === null) return -1;
-
                     return 0;
-                });
-
-
+                })
                 timesData[s.id] = merged;
             }
-
             setTimes(timesData);
         } catch (error) {
             console.error("Error fetching sessions:", error);
@@ -234,7 +230,11 @@ export default function AdminTimeAttackSessions() {
             <AdminSidebar />
 
             {/* Konten Dashboard */}
-            <div className="ml-64 p-8 w-full min-h-screen bg-gradient-to-br from-gray-100 via-purple-200 to-indigo-300 text-black">
+            <div
+                className="flex-1 p-8 w-full min-h-screen 
+                 bg-gradient-to-br from-gray-100 via-purple-200 to-indigo-300 text-black 
+                 mt-16 lg:mt-0 lg:ml-64"
+            >
                 <h1 className="text-4xl font-bold mb-6">🗂️ Kelola Sesi Time Attack</h1>
 
                 {/* Form tambah sesi */}
@@ -263,7 +263,7 @@ export default function AdminTimeAttackSessions() {
                     </div>
                     <button
                         type="submit"
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow transition"
+                        className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow transition"
                     >
                         Tambah Sesi
                     </button>
@@ -310,7 +310,6 @@ export default function AdminTimeAttackSessions() {
                                 </table>
                             </div>
 
-                            {/* Border Time Attack */}
                             {/* Border Time Attack */}
                             <div className="overflow-x-auto bg-gray-50 border border-gray-400 p-4 rounded-lg">
                                 <h3 className="text-lg font-semibold mb-2">⏱️ Time Attack</h3>
