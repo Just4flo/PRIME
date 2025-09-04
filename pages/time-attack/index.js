@@ -280,9 +280,9 @@ export default function TeamAttack() {
                         <thead className="bg-purple-700 text-white sticky top-0 z-10">
                             <tr>
                                 <th className="p-3">Username</th>
-                                <th className="p-3">Waktu (MM:SS.mmm)</th>
-                                <th className="p-3">Gambar</th>
-                                <th className="p-3">Aksi</th>
+                                <th className="p-3">Time (MM:SS.mmm)</th>
+                                <th className="p-3">Image</th>
+                                <th className="p-3">Action</th>
                             </tr>
                         </thead>
 
@@ -386,4 +386,5 @@ export default function TeamAttack() {
         </div>
     );
 }
+
 
