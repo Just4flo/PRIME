@@ -58,7 +58,12 @@ export default function EventLeaderboard() {
     });
 
     // Urutkan berdasarkan score terbesar
-    const sortedMembers = memberWithScores.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+       const sortedMembers = memberWithScores.sort((a, b) => {
+        if ((b.score ?? 0) !== (a.score ?? 0)) {
+            return (b.score ?? 0) - (a.score ?? 0);
+        }
+        return a.Username.localeCompare(b.Username);
+    });
 
     return (
         <div className="min-h-screen bg-white text-black border-4 border-purple-700">
@@ -105,3 +110,4 @@ export default function EventLeaderboard() {
         </div>
     );
 }
+
