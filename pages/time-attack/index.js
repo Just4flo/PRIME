@@ -316,7 +316,7 @@ export default function TeamAttack() {
                                         <td className="p-3">
                                             <div className="flex items-center gap-3">
                                                 <label className="inline-flex items-center px-2 sm:px-3 py-1 sm:py-2 rounded-lg border border-purple-500 cursor-pointer hover:bg-purple-50 text-xs sm:text-sm">
-                                                    <span className="text-sm">Pilih Gambar</span>
+                                                    <span className="text-sm">Select Image</span>
                                                     <input
                                                         type="file"
                                                         accept="image/*"
@@ -386,3 +386,4 @@ export default function TeamAttack() {
         </div>
     );
 }
+
