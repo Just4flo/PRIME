@@ -208,8 +208,7 @@ export default function TeamAttack() {
             )}
 
             <div className="flex-1 w-full px-4 py-8 md:px-8 md:py-16">
-                {/* Leaderboard Section */}
-                {/* Leaderboard Section */}
+
                 <div className="w-full max-w-5xl mx-auto border-4 border-purple-700 rounded-xl p-6 shadow-lg mb-8">
                     <h2 className="text-2xl font-bold mb-4 text-purple-700 flex items-center gap-2">
                         <Trophy className="w-6 h-6 text-yellow-400" /> TOP 10 LEADERBOARD
@@ -217,13 +216,19 @@ export default function TeamAttack() {
 
                     {/* 🔹 Tambahan info map & periode */}
                     {session && (
-                        <div className="mb-4 p-3 rounded-lg bg-yellow-100 border border-yellow-400">
-                            <p className="text-lg font-semibold text-yellow-700">
-                                Track : {session.mapName}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                                Period : {session.startDate} s/d {session.endDate}
-                            </p>
+                        <div className="mb-4 p-3 rounded-lg bg-yellow-100 border border-yellow-400 space-y-1">
+                            <div className="flex">
+                                <span className="w-20 font-semibold text-yellow-700">Track</span>
+                                <span className="text-yellow-700">: {session.mapName}</span>
+                            </div>
+                            <div className="flex">
+                                <span className="w-20 font-semibold text-yellow-700">Car</span>
+                                <span className="text-yellow-700">: {session.carName}</span>
+                            </div>
+                            <div className="flex">
+                                <span className="w-20 font-semibold text-yellow-700">Period</span>
+                                <span className="text-gray-600">: {session.startDate} s/d {session.endDate}</span>
+                            </div>
                         </div>
                     )}
                     <ol className="list-none space-y-2">
@@ -331,9 +336,9 @@ export default function TeamAttack() {
                                                                 return;
                                                             }
 
-                                                            // Validasi ukuran < 1 MB
-                                                            if (file.size > 1024 * 1024) {
-                                                                alert("❌ Ukuran gambar maksimal 1 MB!");
+                                                            // Validasi ukuran < 5 MB
+                                                            if (file.size > 5 * 1024 * 1024) {
+                                                                alert("❌ Ukuran gambar maksimal 5 MB!");
                                                                 e.target.value = "";
                                                                 return;
                                                             }
@@ -386,5 +391,6 @@ export default function TeamAttack() {
         </div>
     );
 }
+
 
 
