@@ -195,21 +195,28 @@ export default function AdminTimeAttackSessions() {
     const handleExportExcel = (sessionId) => {
         const session = sessions.find((s) => s.id === sessionId);
         const data = times[sessionId] || [];
+        const sessionInfo = [
+            { Field: "Map", Value: session.mapName },
+            { Field: "Car", Value: session.carName },
+            { Field: "Start Date", Value: session.startDate },
+            { Field: "End Date", Value: session.endDate },
+            {},
+        ];
 
-        const worksheet = XLSX.utils.json_to_sheet(
-            data.map((t, index) => ({
-                Rank: t.time ? index + 1 : "-",
-                Username: t.Username,
-                Time: t.time ? formatTime(t.time) : "-",
-            }))
-        );
+        const timeData = data.map((t, index) => ({
+            Rank: t.time ? index + 1 : "-",
+            Username: t.Username,
+            Time: t.time ? formatTime(t.time) : "-",
+        }));
+
+        const finalData = [...sessionInfo, ...timeData];
+        const worksheet = XLSX.utils.json_to_sheet(finalData, { skipHeader: true });
 
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "TimeAttack");
-
         XLSX.writeFile(
             workbook,
-            `TimeAttack_${session.mapName}_${session.startDate}-${session.endDate}.xlsx`
+            `TimeAttack_${session.mapName}_${session.carName}_${session.startDate}-${session.endDate}.xlsx`
         );
     };
 
@@ -408,3 +415,4 @@ export default function AdminTimeAttackSessions() {
         </div>
     );
 }
+
