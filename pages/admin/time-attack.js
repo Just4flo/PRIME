@@ -26,6 +26,7 @@ export default function AdminTimeAttackSessions() {
     const [mapName, setMapName] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [carName, setCarName] = useState("");
     const [previewImage, setPreviewImage] = useState(null);
 
 
@@ -118,7 +119,7 @@ export default function AdminTimeAttackSessions() {
     // Tambah sesi baru
     const handleAddSession = async (e) => {
         e.preventDefault();
-        if (!mapName || !startDate || !endDate) {
+        if (!mapName || !carName || !startDate || !endDate) {
             alert("Lengkapi semua field!");
             return;
         }
@@ -126,11 +127,13 @@ export default function AdminTimeAttackSessions() {
         try {
             await addDoc(collection(db, "team_attack_sessions"), {
                 mapName,
+                carName, 
                 startDate,
                 endDate,
             });
             alert("✅ Sesi baru berhasil ditambahkan!");
             setMapName("");
+            setCarName(""); 
             setStartDate("");
             setEndDate("");
             fetchSessions();
@@ -240,12 +243,19 @@ export default function AdminTimeAttackSessions() {
                 {/* Form tambah sesi */}
                 <form onSubmit={handleAddSession} className="bg-white/90 p-6 rounded-2xl shadow-xl mb-8">
                     <h2 className="text-2xl font-semibold mb-4">Tambah Sesi Baru</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         <input
                             type="text"
                             placeholder="Nama Map"
                             value={mapName}
                             onChange={(e) => setMapName(e.target.value)}
+                            className="p-3 border rounded-lg w-full"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Nama Mobil"
+                            value={carName}
+                            onChange={(e) => setCarName(e.target.value)}
                             className="p-3 border rounded-lg w-full"
                         />
                         <input
@@ -281,6 +291,8 @@ export default function AdminTimeAttackSessions() {
                                 <table className="w-full text-left border-collapse rounded-lg overflow-hidden">
                                     <thead className="bg-purple-700 text-white">
                                         <tr>
+                                            <th className="p-3">Nama Map</th>
+                                            <th className="p-3">Nama Mobil</th>
                                             <th className="p-3">Tanggal Mulai</th>
                                             <th className="p-3">Tanggal Selesai</th>
                                             <th className="p-3">Aksi</th>
@@ -288,6 +300,8 @@ export default function AdminTimeAttackSessions() {
                                     </thead>
                                     <tbody>
                                         <tr className="border-t border-purple-600 hover:bg-purple-100 transition">
+                                            <td className="p-3">{item.mapName}</td>
+                                            <td className="p-3">{item.carName}</td> {/* ✅ tampilkan mobil */}
                                             <td className="p-3">{item.startDate}</td>
                                             <td className="p-3">{item.endDate}</td>
                                             <td className="p-3 space-x-2">
