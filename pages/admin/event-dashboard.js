@@ -23,16 +23,22 @@ const formatNumber = (num) => {
 
 export default function AdminEventDashboard() {
     const router = useRouter();
-    const { type } = router.query; // "endurance" atau "duel-team"
+    const { group, type } = router.query;
 
     const [members, setMembers] = useState([]);
     const [formData, setFormData] = useState({ Username: "", score: "" });
     const [participants, setParticipants] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // 📂 pilih collection sesuai type
-    const collectionName =
-        type === "duel-team" ? "event_dual_team" : "event_endurance";
+    // --- PERUBAHAN UTAMA DI SINI ---
+    // 📂 Tentukan nama koleksi event secara dinamis berdasarkan 'group' dan 'type'
+    const eventTypeCollection = type === 'duel-team' ? 'dual_team' : 'endurance';
+    const collectionName = group === 'prime_id'
+        ? `prime_id_event_${eventTypeCollection}` // Koleksi untuk PRIME ID (contoh: prime_id_event_endurance)
+        : `event_${eventTypeCollection}`;         // Koleksi untuk PRIME (contoh: event_endurance)
+
+    // 📂 Tentukan koleksi member berdasarkan 'group'
+    const memberCollectionName = group === "prime_id" ? "prime_id" : "members";
 
     // 🔒 Proteksi halaman
     useEffect(() => {
@@ -46,35 +52,36 @@ export default function AdminEventDashboard() {
         return () => unsubscribe();
     }, [router]);
 
-    // 📌 Ambil daftar member
+    // 📌 Ambil daftar member dari koleksi yang BENAR (members atau prime_id)
     useEffect(() => {
+        if (!group) return;
         const fetchMembers = async () => {
-            const snapshot = await getDocs(collection(db, "members"));
+            const snapshot = await getDocs(collection(db, memberCollectionName));
             setMembers(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         };
         fetchMembers();
-    }, []);
+    }, [group, memberCollectionName]);
 
     // 📌 Ambil daftar peserta sesuai event
     useEffect(() => {
-        if (!type) return;
+        if (!type || !collectionName) return;
         const fetchParticipants = async () => {
             const q = query(
                 collection(db, collectionName),
-                orderBy("score", "desc") // urutkan berdasarkan skor tertinggi
+                orderBy("score", "desc")
             );
             const snapshot = await getDocs(q);
             setParticipants(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         };
         fetchParticipants();
-    }, [type]);
+    }, [type, collectionName]);
 
-    // 📌 Submit skor
+    // 📌 Submit skor (tidak ada perubahan logika)
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.Username || !formData.score) return;
 
-        const scoreValue = parseInt(formData.score.replace(/\./g, ""), 10); // hapus titik sebelum simpan
+        const scoreValue = parseInt(formData.score.replace(/\./g, ""), 10);
         if (isNaN(scoreValue)) {
             alert("Skor harus berupa angka valid!");
             return;
@@ -102,7 +109,7 @@ export default function AdminEventDashboard() {
         }
     };
 
-    // 📌 Hapus semua peserta
+    // 📌 Hapus semua peserta (tidak ada perubahan logika)
     const handleDeleteAll = async () => {
         if (!confirm("Apakah yakin ingin menghapus semua peserta untuk event ini?"))
             return;
@@ -124,20 +131,23 @@ export default function AdminEventDashboard() {
         return (
             <div className="min-h-screen flex items-center justify-center">Loading...</div>
         );
-    if (!type)
+
+    if (!group || !type)
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                Pilih event terlebih dahulu dari sidebar
+            <div className="flex min-h-screen">
+                <AdminSidebar />
+                <div className="flex-1 flex items-center justify-center text-center p-4">
+                    Pilih grup (PRIME / PRIME ID) dan jenis event dari sidebar untuk memulai.
+                </div>
             </div>
         );
 
     return (
         <div className="flex min-h-screen bg-white text-black">
             <AdminSidebar />
-
             <div className="flex-1 px-8 py-16">
-                <h1 className="text-4xl font-bold text-purple-700 mb-12 text-center">
-                    {type === "duel-team" ? "Duel Team" : "Endurance"} Dashboard
+                <h1 className="text-4xl font-bold text-purple-700 mb-12 text-center uppercase">
+                    {group.replace('_', ' ')} - {type === "duel-team" ? "DUEL TEAM" : "ENDURANCE"} DASHBOARD
                 </h1>
 
                 <div className="border-4 border-purple-700 rounded-xl p-6 shadow-lg max-w-lg mx-auto">
@@ -168,7 +178,6 @@ export default function AdminEventDashboard() {
                                 </option>
                             ))}
                         </select>
-
                         <input
                             type="text"
                             placeholder="Masukkan Skor (contoh: 1.000.000)"
@@ -176,10 +185,7 @@ export default function AdminEventDashboard() {
                             onChange={(e) => {
                                 const raw = e.target.value.replace(/\./g, "");
                                 if (!isNaN(raw)) {
-                                    setFormData({
-                                        ...formData,
-                                        score: formatNumber(raw),
-                                    });
+                                    setFormData({ ...formData, score: formatNumber(raw) });
                                 }
                             }}
                             className="border-2 border-purple-700 rounded-lg p-3"
@@ -201,7 +207,6 @@ export default function AdminEventDashboard() {
                             >
                                 Reset Skor Event (Hapus Semua Peserta)
                             </button>
-
                             <h3 className="text-xl font-bold text-purple-700 mb-2">
                                 Peringkat Peserta
                             </h3>
@@ -209,26 +214,16 @@ export default function AdminEventDashboard() {
                                 <thead>
                                     <tr className="bg-purple-100 text-purple-700">
                                         <th className="border border-purple-300 px-2 py-1">#</th>
-                                        <th className="border border-purple-300 px-2 py-1">
-                                            Username
-                                        </th>
-                                        <th className="border border-purple-300 px-2 py-1">
-                                            Skor
-                                        </th>
+                                        <th className="border border-purple-300 px-2 py-1">Username</th>
+                                        <th className="border border-purple-300 px-2 py-1">Skor</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {participants.map((p, idx) => (
                                         <tr key={p.id} className="text-center">
-                                            <td className="border border-purple-300 px-2 py-1">
-                                                {idx + 1}
-                                            </td>
-                                            <td className="border border-purple-300 px-2 py-1">
-                                                {p.Username}
-                                            </td>
-                                            <td className="border border-purple-300 px-2 py-1">
-                                                {formatNumber(p.score)}
-                                            </td>
+                                            <td className="border border-purple-300 px-2 py-1">{idx + 1}</td>
+                                            <td className="border border-purple-300 px-2 py-1">{p.Username}</td>
+                                            <td className="border border-purple-300 px-2 py-1">{formatNumber(p.score)}</td>
                                         </tr>
                                     ))}
                                 </tbody>

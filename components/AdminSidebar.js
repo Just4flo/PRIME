@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { LayoutDashboard, Users, Calendar, Clock, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Bell, Users, Calendar, Clock, LogOut, Menu, X, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "@/config/firebase";
+import { motion, AnimatePresence } from "framer-motion";
 
 const auth = getAuth(app);
 
@@ -11,17 +12,21 @@ export default function AdminSidebar() {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
 
+    // State untuk setiap dropdown
+    const [isMembersOpen, setIsMembersOpen] = useState(false); // <-- State BARU untuk Members
+    const [isEventOpen, setIsEventOpen] = useState(false);
+    const [isTimeAttackOpen, setIsTimeAttackOpen] = useState(false);
+
     const handleLogout = async () => {
         try {
             await signOut(auth);
             router.push("/login");
         } catch (error) {
-            console.error("Logout failed:", error);
+            console.error("Logout error:", error);
         }
     };
 
-    const navItemClass =
-        "flex items-center gap-3 px-4 py-2 rounded-lg transition-all hover:bg-purple-700 cursor-pointer";
+    const navItemClass = "flex items-center gap-3 px-4 py-2 rounded-lg transition-all hover:bg-purple-700 cursor-pointer";
 
     return (
         <>
@@ -47,43 +52,108 @@ export default function AdminSidebar() {
                         <LayoutDashboard size={20} />
                         Dashboard
                     </Link>
-
-                    <Link
-                        href="/admin/update-member"
-                        className={navItemClass}
-                        onClick={() => setIsOpen(false)}
-                    >
-                        <Users size={20} />
-                        Manage Members
+                    <Link href="/admin/announcement" className={navItemClass} onClick={() => setIsOpen(false)}>
+                        <Bell size={20} />
+                        Announcements
                     </Link>
 
-                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-purple-700 transition-all cursor-pointer border border-purple-700">
-                        <Calendar size={20} />
-                        <select
-                            onChange={(e) => {
-                                router.push(`/admin/event-dashboard?type=${e.target.value}`);
-                                setIsOpen(false);
-                            }}
-                            className="bg-white text-purple-900 font-semibold px-2 py-1 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 w-full cursor-pointer"
-                            defaultValue=""
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsMembersOpen(!isMembersOpen)}
+                            className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-purple-700 transition-all border border-purple-700 text-left"
                         >
-                            <option value="" disabled>
-                                Event
-                            </option>
-                            <option value="endurance">Endurance</option>
-                            <option value="duel-team">Duel</option>
-                        </select>
+                            <div className="flex items-center gap-3">
+                                <Users size={20} />
+                                <span className="font-semibold">Manage Members</span>
+                            </div>
+                            <motion.div animate={{ rotate: isMembersOpen ? 180 : 0 }}>
+                                <ChevronDown size={20} />
+                            </motion.div>
+                        </button>
+
+                        <AnimatePresence>
+                            {isMembersOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="mt-2 flex flex-col gap-2 pl-6 text-sm"
+                                >
+                                    <Link href="/admin/update-member" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- PRIME</Link>
+                                    <Link href="/admin/prime_id" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- PRIME ID</Link>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
-                    <Link
-                        href="/admin/time-attack"
-                        className={navItemClass}
-                        onClick={() => setIsOpen(false)}
-                    >
-                        <Clock size={20} />
-                        Time Attack
-                    </Link>
+                    <div className="relative">
+                        {/* Tombol Pemicu Dropdown */}
+                        <button
+                            onClick={() => setIsEventOpen(!isEventOpen)}
+                            className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-purple-700 transition-all border border-purple-700 text-left"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Calendar size={20} />
+                                <span className="font-semibold">Event Dashboard</span>
+                            </div>
+                            <motion.div animate={{ rotate: isEventOpen ? 180 : 0 }}>
+                                <ChevronDown size={20} />
+                            </motion.div>
+                        </button>
 
+                        {/* Menu Dropdown Bertingkat */}
+                        <AnimatePresence>
+                            {isEventOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="mt-2 flex flex-col gap-2 pl-6 text-sm" // Diberi indentasi
+                                >
+                                    {/* Sub-menu PRIME */}
+                                    <div className="font-medium text-purple-300">PRIME</div>
+                                    <Link href="/admin/event-dashboard?group=prime&type=endurance" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- Endurance</Link>
+                                    <Link href="/admin/event-dashboard?group=prime&type=duel-team" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- Duel Team</Link>
+
+                                    {/* Sub-menu PRIME ID */}
+                                    <div className="font-medium text-purple-300 mt-2">PRIME ID</div>
+                                    <Link href="/admin/event-dashboard?group=prime_id&type=endurance" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- Endurance</Link>
+                                    <Link href="/admin/event-dashboard?group=prime_id&type=duel-team" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- Duel Team</Link>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsTimeAttackOpen(!isTimeAttackOpen)}
+                            className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-purple-700 transition-all border border-purple-700 text-left"
+                        >
+                            <div className="flex items-center gap-3">
+                                <Clock size={20} />
+                                <span className="font-semibold">Time Attack</span>
+                            </div>
+                            <motion.div animate={{ rotate: isTimeAttackOpen ? 180 : 0 }}>
+                                <ChevronDown size={20} />
+                            </motion.div>
+                        </button>
+
+                        <AnimatePresence>
+                            {isTimeAttackOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="mt-2 flex flex-col gap-2 pl-6 text-sm"
+                                >
+                                    <Link href="/admin/time-attack?group=prime" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- PRIME</Link>
+                                    <Link href="/admin/time-attack?group=prime_id" onClick={() => setIsOpen(false)} className="pl-4 py-1 rounded hover:bg-purple-700">- PRIME ID</Link>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Tombol Logout */}
                     <button
                         onClick={() => {
                             handleLogout();
@@ -92,7 +162,7 @@ export default function AdminSidebar() {
                         className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-red-600 transition-all text-white mt-auto w-full text-left"
                     >
                         <LogOut size={20} />
-                        Logout
+                        <span className="font-semibold">Logout</span>
                     </button>
                 </nav>
             </div>

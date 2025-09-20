@@ -1,10 +1,20 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Home, Menu, Users, Calendar, Clock, LogIn, Info } from "lucide-react";
+import { Home, Menu, Users, Calendar, Clock, LogIn, Info, Bell } from "lucide-react";
 
 export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setMenuOpen(false);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <>
@@ -26,11 +36,15 @@ export default function Navbar() {
 
                 {/* Desktop Menu */}
                 <nav className="hidden md:flex gap-8 text-white font-semibold text-lg">
+                    {/* ... link desktop tidak berubah ... */}
                     <Link href="/" className="flex items-center gap-2 hover:text-purple-300 transition">
                         <Home size={20} /> HomePage
                     </Link>
                     <Link href="/about" className="flex items-center gap-2 hover:text-purple-300 transition">
                         <Info size={20} /> About us
+                    </Link>
+                    <Link href="/announ" className="flex items-center gap-2 hover:text-purple-300 transition">
+                        <Bell size={20} /> Announcements
                     </Link>
                     <Link href="/member" className="flex items-center gap-2 hover:text-purple-300 transition">
                         <Users size={20} /> Members
@@ -57,9 +71,17 @@ export default function Navbar() {
 
             {/* Mobile Dropdown */}
             {menuOpen && (
-                <nav className="absolute top-20 left-0 w-full bg-purple-900 bg-opacity-95 flex flex-col gap-5 px-6 py-6 md:hidden z-40 text-white text-lg font-medium animate-slideDown">
+                // --- PERUBAHAN DI SINI ---
+                // Menghapus `h-screen` dan menambahkan `rounded-b-xl` serta `shadow-xl` untuk estetika
+                <nav className="fixed top-23 left-0 w-full bg-purple-900 bg-opacity-95 flex flex-col gap-5 px-6 py-6 md:hidden z-40 text-white text-lg font-medium animate-slideDown rounded-b-xl shadow-xl">
                     <Link href="/" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Home /> HomePage</Link>
                     <Link href="/about" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Info /> About us</Link>
+                    <Link href="/announ"
+                        className="flex items-center gap-3 hover:text-purple-300"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        <Bell /> Announcement
+                    </Link>
                     <Link href="/member" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Users /> Members</Link>
                     <Link href="/events" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Calendar /> Event</Link>
                     <Link href="/time-attack" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Clock /> Time Attack</Link>

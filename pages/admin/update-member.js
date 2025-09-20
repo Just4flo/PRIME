@@ -144,7 +144,7 @@ export default function MembersPage() {
                     </div>
                 )}
 
-                <h1 className="text-3xl font-bold mb-6">Manage Members</h1>
+                <h1 className="text-3xl font-bold mb-6">Manage PRIME</h1>
 
                 {/* Search */}
                 <div className="mb-4">
@@ -315,7 +315,7 @@ export default function MembersPage() {
                             </div>
                         </div>
                     ))}
-                </div>                                                  
+                </div>
 
                 {/* Desktop View (Table) */}
                 <div className="hidden sm:block overflow-x-auto bg-white/90 p-4 sm:p-6 rounded-2xl shadow-xl text-black max-h-[70vh]">
