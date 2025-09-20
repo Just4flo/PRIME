@@ -24,11 +24,11 @@ export default function Navbar() {
                 {/* ... (Isi header tidak berubah) ... */}
                 <div className="flex items-center gap-3">
                     <Image src="/logo.png" alt="Logo" width={100} height={100} className="object-cover" />
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-wide drop-shadow-lg animate-pulse">
+                    <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-wide drop-shadow-lg animate-pulse">
                         <span className="text-purple-300">PRIME</span>
                     </h1>
                 </div>
-                <nav className="hidden md:flex gap-8 text-white font-semibold text-lg">
+                <nav className="hidden md:flex gap-8 text-white font-semibold text-base">
                     <Link href="/" className="flex items-center gap-2 hover:text-purple-300 transition"><Home size={20} /> HomePage</Link>
                     <Link href="/about" className="flex items-center gap-2 hover:text-purple-300 transition"><Info size={20} /> About us</Link>
                     <Link href="/announ" className="flex items-center gap-2 hover:text-purple-300 transition"><Bell size={20} /> Announcements</Link>
@@ -42,13 +42,12 @@ export default function Navbar() {
                 </button>
             </header>
 
-            {/* --- TAMBAHKAN DIV INI --- */}
-            {/* Placeholder untuk mendorong konten ke bawah setinggi navbar (h-23) */}
+
             <div className="h-23" />
 
             {/* Mobile Dropdown */}
             {menuOpen && (
-                <nav className="fixed top-23 left-0 w-full bg-purple-900 bg-opacity-95 flex flex-col gap-5 px-6 py-6 md:hidden z-40 text-white text-lg font-medium animate-slideDown rounded-b-xl shadow-xl">
+                <nav className="fixed top-23 left-0 w-full bg-purple-900 bg-opacity-95 flex flex-col gap-5 px-6 py-6 md:hidden z-40 text-white text-base font-medium animate-slideDown rounded-b-xl shadow-xl">
                     <Link href="/" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Home /> HomePage</Link>
                     <Link href="/about" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Info /> About us</Link>
                     <Link href="/announ" className="flex items-center gap-3 hover:text-purple-300" onClick={() => setMenuOpen(false)}><Bell /> Announcement</Link>
@@ -61,3 +60,4 @@ export default function Navbar() {
         </>
     );
 }
+
